@@ -11,7 +11,11 @@ This library is licensed under the MIT-0 License.
 
 == Summary
 
-This workshop will launch an instance using the AWS FPGA Developer AMI and configure the instance as a remote desktop using NICE DCV. The AWS FPGA Developer AMI includes the Xilinx Vivado Design Suite. After launch, you will connect using a web browser (or the DCV client) and launch the Vivado GUI and run a workflow with an example design. Here is an animated gif showing a quick overview of the workshop steps:
+NICE DCV is a high-performance remote display protocol that provides customers with a secure way to deliver remote desktops and application streaming from any cloud or data center to any device, over varying network conditions. With NICE DCV and Amazon EC2, customers can run graphics-intensive applications remotely on EC2 instances, and stream the results to simpler client machines, eliminating the need for expensive dedicated workstations. Customers across a broad range of HPC workloads use NICE DCV for their remote visualization requirements. The NICE DCV streaming protocol is also utilized by popular services, like Amazon Appstream 2.0 and AWS RoboMaker.
+
+This workshop will launch an instance using the AWS FPGA Developer AMI and configure the instance as a remote desktop using NICE DCV. The AWS FPGA Developer AMI includes the Xilinx Vivado Design Suite. After launch, you will connect using a web browser (or the DCV client) and launch the Vivado GUI and run a workflow with an example design.
+
+Here is an animated gif showing a quick overview of the workshop steps:
 
 .Example launch, see the full resolution video here: https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_demo_video.mov[Vivado DCV Demo]
 [#img-vivado]
@@ -35,6 +39,9 @@ It will take approximately 40 minutes for CloudFormation to automatically create
 
 image::/images/vivado_dcv_diagram.png[align="center", width=600]
 
+== Price
+
+There is no additional charge to use NICE DCV on Amazon EC2. You pay only for the EC2 resources you use to run and store your workloads.
 
 == Step-by-step Guide
 
