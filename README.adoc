@@ -84,10 +84,11 @@ a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.c
 | *Sydney* (ap-southeast-2)
 a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
-| *Hong Kong* (ap-east-1)
+| *Hong Kong** (ap-east-1)
 a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
 |===
+**May require additional request for access*
 
 
 +
