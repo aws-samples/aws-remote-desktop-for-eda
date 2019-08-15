@@ -1,0 +1,472 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Conditions:
+  Has_Bucket: !Not
+    - !Equals
+      - !Ref 'S3BucketName'
+      - NO_VALUE
+  Has_Public_Ip: !Equals
+    - !Ref 'UsePublicIp'
+    - 'True'
+  Has_Static_Private_IP: !Not
+    - !Equals
+      - !Ref 'StaticPrivateIpAddress'
+      - NO_VALUE
+  create_elastic_ip: !Equals
+    - !Ref 'CreateElasticIP'
+    - 'True'
+  not_existing_sg: !Equals
+    - !Ref 'ExistingSecurityGroup'
+    - NO_VALUE
+Description: DCV 2017 Remote Desktop with Xilinx Vivado (using AWS FPGA Developer
+  AMI)
+Mappings:
+  AWSRegionAMI:
+    ap-east-1:
+      centos7: ami-f44f3785
+    ap-northeast-1:
+      centos7: ami-01c6b51fe8525af71
+    ap-northeast-2:
+      centos7: ami-0de44a841014b9e10
+    ap-south-1:
+      centos7: ami-0fbad96708b2cb7eb
+    ap-southeast-1:
+      centos7: ami-047586fe27dd4dca5
+    ap-southeast-2:
+      centos7: ami-06dc438e221a40328
+    ca-central-1:
+      centos7: ami-0e34c6f9c75696d8e
+    eu-central-1:
+      centos7: ami-0ac82e537f386ca99
+    eu-north-1:
+      centos7: ami-d35fd6ad
+    eu-west-1:
+      centos7: ami-0157c1e780f144955
+    eu-west-2:
+      centos7: ami-0e6580b0663210a44
+    eu-west-3:
+      centos7: ami-009002993433a3c75
+    sa-east-1:
+      centos7: ami-00bd76ca9b4be8367
+    us-east-1:
+      centos7: ami-0e560af290c745f5b
+    us-east-2:
+      centos7: ami-04207b688d79a3b2c
+    us-west-1:
+      centos7: ami-0f53c9faf89b4c688
+    us-west-2:
+      centos7: ami-02b792770bf83b668
+Metadata:
+  AWS::CloudFormation::Interface:
+    ParameterGroups:
+      - Label:
+          default: Instance Configuration
+        Parameters:
+          - VPCId
+          - Subnet
+          - ExistingSecurityGroup
+          - remoteDesktopInstanceType
+          - EC2KeyName
+          - OperatingSystem
+          - StaticPrivateIpAddress
+          - UsePublicIp
+          - CreateElasticIP
+          - S3BucketName
+          - AccessCidr
+      - Label:
+          default: DCV Configuration
+        Parameters:
+          - UserName
+          - UserPass
+    ParameterLabels:
+      AccessCidr:
+        default: CIDR block for remote access (ports 22 and 8443)
+      CreateElasticIP:
+        default: Create an Elastic IP address
+      EC2KeyName:
+        default: EC2 Key Name
+      ExistingSecurityGroup:
+        default: 'OPTIONAL: Existing Security Group (e.g. sg-abcd1234efgh)'
+      OperatingSystem:
+        default: Operating System of AMI
+      S3BucketName:
+        default: 'OPTIONAL: S3 bucket for read access'
+      StaticPrivateIpAddress:
+        default: 'OPTIONAL: Static Private IP Address'
+      Subnet:
+        default: Subnet ID
+      UsePublicIp:
+        default: Assign a public IP Address
+      UserName:
+        default: User name for DCV login
+      UserPass:
+        default: Password for DCV login
+      VPCId:
+        default: VPC ID
+      remoteDesktopInstanceType:
+        default: Remote Desktop Instance Type
+Outputs:
+  DCVConnectionLink:
+    Description: Connect to the DCV Remote Desktop with this URL
+    Value: !Sub 'https://${remoteDesktopInstance.PublicIp}:8443'
+  DCVUserName:
+    Description: Login name for DCV session
+    Value: !Ref 'UserName'
+  SSHTunnelCommand:
+    Description: Command for setting up SSH tunnel to remote desktop, use "localhost:18443"
+      for DCV client
+    Value: !Sub 'ssh -i <file.pem> -L 18443:localhost:8443 -l centos ${remoteDesktopInstance.PublicIp}'
+Parameters:
+  AccessCidr:
+    AllowedPattern: (\d{1,3})\.(\d{1,3})\.(\d{1,3})\.(\d{1,3})/(\d{1,2})
+    ConstraintDescription: Must be a valid CIDR x.x.x.x/x
+    Default: 111.222.333.444/32
+    Description: This is the CIDR block for allowing remote access, for ports 22 and
+      8443
+    Type: String
+  CreateElasticIP:
+    AllowedValues:
+      - 'True'
+      - 'False'
+    ConstraintDescription: True/False
+    Default: 'True'
+    Description: Should an Elastic IP address be created and assigned, this allows
+      for persistent IP address assignment
+    Type: String
+  EC2KeyName:
+    ConstraintDescription: 'REQUIRED: Must be a valid EC2 key pair'
+    Description: Name of an existing EC2 KeyPair to enable SSH access to the instance.
+    Type: AWS::EC2::KeyPair::KeyName
+  ExistingSecurityGroup:
+    Default: NO_VALUE
+    Description: 'OPTIONAL: Needs to be a SG ID, for example sg-abcd1234efgh. This
+      is an already existing Security Group ID that is in the same VPC, this is an
+      addition to the security groups that are automatically created to enable access
+      to the remote desktop,leave as NO_VALUE if you choose not to use this'
+    Type: String
+  OperatingSystem:
+    AllowedValues:
+      - centos7
+    ConstraintDescription: 'Must be: centos7'
+    Default: centos7
+    Description: Operating System of the AMI
+    Type: String
+  S3BucketName:
+    Default: NO_VALUE
+    Description: 'OPTIONAL: S3 bucket to allow this instance read access (List and
+      Get),leave as NO_VALUE if you choose not to use this'
+    Type: String
+  StaticPrivateIpAddress:
+    Default: NO_VALUE
+    Description: 'OPTIONAL: If you already have a private VPC address range, you can
+      specify the private IP address to use, leave as NO_VALUE if you choose not to
+      use this'
+    Type: String
+  Subnet:
+    Description: For the Subnet ID, you should choose one in the Availability Zone
+      where you want the instance launched
+    Type: AWS::EC2::Subnet::Id
+  UsePublicIp:
+    AllowedValues:
+      - 'True'
+      - 'False'
+    ConstraintDescription: True/False
+    Default: 'True'
+    Description: Should a public IP address be given to the instance, this is overridden
+      by CreateElasticIP=True
+    Type: String
+  UserName:
+    Default: simuser
+    Description: User name for DCV remote desktop login, default is "simuser".
+    MinLength: '4'
+    Type: String
+  UserPass:
+    AllowedPattern: ^((?=.*[a-z])(?=.*[A-Z])(?=.*[\d])|(?=.*[a-z])(?=.*[A-Z])(?=.*[\W_])|(?=.*[a-z])(?=.*[\d])(?=.*[\W_])|(?=.*[A-Z])(?=.*[\d])(?=.*[\W_])).+$
+    ConstraintDescription: 'Password must contain at least one element from three
+      of the following sets: lowercase letters, uppercase letters, base 10 digits,
+      non-alphanumeric characters'
+    Default: Ch4ng3M3!
+    Description: Password for DCV remote desktop login. The default password is Ch4ng3M3!
+    MinLength: '8'
+    NoEcho: true
+    Type: String
+  VPCId:
+    Description: VPC ID for where the remote desktop instance should be launched
+    Type: AWS::EC2::VPC::Id
+  remoteDesktopInstanceType:
+    AllowedValues:
+      - m4.large
+      - m4.xlarge
+      - m4.2xlarge
+      - m4.4xlarge
+      - m4.10xlarge
+      - m5.large
+      - m5.xlarge
+      - m5.2xlarge
+      - m5.4xlarge
+      - m5.12xlarge
+      - m5.24xlarge
+      - z1d.large
+      - z1d.xlarge
+      - z1d.2xlarge
+      - z1d.3xlarge
+      - z1d.6xlarge
+      - z1d.12xlarge
+      - z1d.metal
+    ConstraintDescription: Must an EC2 instance type from the list
+    Default: m4.xlarge
+    Description: This is the instance type that will be used. As this is a 2D workstation,
+      we are not supporting GPU instance types.
+    Type: String
+Resources:
+  BucketPolicy:
+    Condition: Has_Bucket
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+            Effect: Allow
+            Resource: !Sub 'arn:aws:s3:::${S3BucketName}/*'
+          - Action:
+              - s3:ListBucket
+            Effect: Allow
+            Resource: !Sub 'arn:aws:s3:::${S3BucketName}'
+        Version: '2012-10-17'
+      PolicyName: BucketPolicy
+      Roles:
+        - !Ref 'RootRole'
+    Type: AWS::IAM::Policy
+  EIPAddress:
+    Condition: create_elastic_ip
+    Properties:
+      Domain: vpc
+      InstanceId: !Ref 'remoteDesktopInstance'
+    Type: AWS::EC2::EIP
+  InstanceWaitHandle:
+    Type: AWS::CloudFormation::WaitConditionHandle
+  RootInstanceProfile:
+    Properties:
+      Roles:
+        - !Ref 'RootRole'
+    Type: AWS::IAM::InstanceProfile
+  RootRole:
+    Properties:
+      AssumeRolePolicyDocument:
+        Statement:
+          - Action:
+              - sts:AssumeRole
+            Effect: Allow
+            Principal:
+              Service:
+                - ec2.amazonaws.com
+        Version: '2012-10-17'
+    Type: AWS::IAM::Role
+  SshSecurityGroup:
+    Properties:
+      GroupDescription: SSH Secuirty group
+      SecurityGroupIngress:
+        - CidrIp: !Ref 'AccessCidr'
+          FromPort: '22'
+          IpProtocol: tcp
+          ToPort: '22'
+      VpcId: !Ref 'VPCId'
+    Type: AWS::EC2::SecurityGroup
+  dcvBucketPolicy:
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Action:
+              - s3:GetObject
+            Effect: Allow
+            Resource: arn:aws:s3:::dcv-license.us-east-1/*
+        Version: '2012-10-17'
+      PolicyName: dcvBucketPolicy
+      Roles:
+        - !Ref 'RootRole'
+    Type: AWS::IAM::Policy
+  instanceWaitCondition:
+    DependsOn: remoteDesktopInstance
+    Properties:
+      Handle: !Ref 'InstanceWaitHandle'
+      Timeout: '3600'
+    Type: AWS::CloudFormation::WaitCondition
+  remoteDesktopInstance:
+    Properties:
+      DisableApiTermination: 'false'
+      IamInstanceProfile: !Ref 'RootInstanceProfile'
+      ImageId: !FindInMap
+        - AWSRegionAMI
+        - !Ref 'AWS::Region'
+        - !Ref 'OperatingSystem'
+      InstanceType: !Ref 'remoteDesktopInstanceType'
+      KeyName: !Ref 'EC2KeyName'
+      NetworkInterfaces:
+        - AssociatePublicIpAddress: !Ref 'UsePublicIp'
+          DeleteOnTermination: 'true'
+          DeviceIndex: '0'
+          GroupSet: !If
+            - not_existing_sg
+            - - !Ref 'remoteDesktopSecurityGroup'
+              - !Ref 'SshSecurityGroup'
+            - - !Ref 'remoteDesktopSecurityGroup'
+              - !Ref 'SshSecurityGroup'
+              - !Ref 'ExistingSecurityGroup'
+          PrivateIpAddress: !If
+            - Has_Static_Private_IP
+            - !Ref 'StaticPrivateIpAddress'
+            - !Ref 'AWS::NoValue'
+          SubnetId: !Ref 'Subnet'
+      UserData: !Base64
+        Fn::Sub: |+
+          #!/usr/bin/env bash
+
+          set -x
+
+          ##exit 0
+
+          my_wait_handle="${InstanceWaitHandle}"
+          user_name="${UserName}"
+          user_pass="${UserPass}"
+
+          #@IgnoreInspection BashAddShebang
+          #
+          # Licensed under the Apache License, Version 2.0 (the "License"). You may not use this file
+          # except in compliance with the License. A copy of the License is located at
+          #
+          #     http://aws.amazon.com/apache2.0/
+          #
+          # or in the "license" file accompanying this file. This file is distributed on an "AS IS"
+          # BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied. See the
+          # License for the specific language governing permissions and limitations under the License.
+          #
+
+          echo hello
+
+          function install_prereqs {
+            sudo yum -y groupinstall "GNOME Desktop"
+            sudo yum -y upgrade
+          }
+
+          function install_dcv {
+            mkdir /tmp/dcv-inst.d
+            pushd /tmp/dcv-inst.d
+            rpm --import https://s3-eu-west-1.amazonaws.com/nice-dcv-publish/NICE-GPG-KEY
+            wget https://d1uj6qtbmh3dt5.cloudfront.net/server/nice-dcv-2017.4-6898-el7.tgz
+            tar xvf nice-dcv-2017.4-6898-el7.tgz
+            cd nice-dcv-2017.4-6898-el7/
+            yum -y install nice-dcv-server-2017.4.6898-1.el7.x86_64.rpm nice-xdcv-2017.4.210-1.el7.x86_64.rpm nice-dcv-gltest-2017.4.216-1.el7.x86_64.rpm
+            popd
+          }
+
+          function add_user {
+
+            user_name=${!user_name}
+            user_pass=${!user_pass}
+
+            groupadd ${!user_name}
+            useradd ${!user_name} -m -g ${!user_name}
+            echo "${!user_name}:${!user_pass}" | chpasswd
+            echo "Created user ${!user_name}"
+
+          }
+
+          function cr_post_reboot {
+
+          if [[ ! -d /opt/dcv-install ]]; then
+            mkdir /opt/dcv-install
+          fi
+
+          cat << EOF > /opt/dcv-install/post_reboot.sh
+          #!/usr/bin/env bash
+
+          function stop_disable_svc() {
+            systemctl stop \$1
+            systemctl disable \$1
+          }
+
+          stop_disable_svc firewalld
+          stop_disable_svc libvirtd
+          systemctl isolate multi-user.target
+          systemctl isolate graphical.target
+          DISPLAY=:0 XAUTHORITY=\$(ps aux | grep "X.*\\-auth" | grep -v grep | awk -F"-auth " '{print \$2}' | awk '{print \$1}') xhost | grep "SI:localuser:dcv$"
+          dcv create-session --type=virtual --owner ${!user_name} --user ${!user_name} virt
+          dcv list-sessions
+
+          my_wait_handle="${!my_wait_handle}"
+
+          if [[ ! -f /tmp/wait-handle-sent ]]; then
+            exit 0
+          else
+            wait_handle_status=\$(cat /tmp/wait-handle-sent)
+            if [[ \${!wait_handle_status} == "true" ]]; then
+              rm /tmp/wait-handle-sent
+              exit 0
+            elif [[ \${!wait_handle_status} == "false" && \${!my_wait_handle} != "" ]] ; then
+              echo "Sending success to wait handle"
+              curl -X PUT -H 'Content-Type:' --data-binary '{ "Status" : "SUCCESS",  "Reason" : "instance launched",  "UniqueId" : "inst001",  "Data" : "instance launched."}' "\${!my_wait_handle}"
+              echo "true" > /tmp/wait-handle-sent
+            fi
+          fi
+
+          EOF
+
+          chmod 744 /opt/dcv-install/post_reboot.sh
+
+          }
+
+          function cr_service {
+
+          cat << EOF > /etc/systemd/system/post-reboot.service
+          [Unit]
+          Description=Post reboot service
+
+          [Service]
+          ExecStart=/opt/dcv-install/post_reboot.sh
+
+          [Install]
+          WantedBy=multi-user.target
+          EOF
+
+          chmod 664 /etc/systemd/system/post-reboot.service
+          systemctl daemon-reload
+          systemctl enable post-reboot.service
+
+          }
+
+          function stop_disable_svc() {
+            systemctl stop $1
+            systemctl disable $1
+          }
+
+
+          function main {
+
+          install_prereqs
+          install_dcv
+          add_user
+          cr_post_reboot
+          cr_service
+
+          systemctl enable dcvserver
+          echo "false" > /tmp/wait-handle-sent
+          stop_disable_svc firewalld
+          stop_disable_svc libvirtd
+          reboot
+
+          }
+
+          main
+
+
+    Type: AWS::EC2::Instance
+  remoteDesktopSecurityGroup:
+    Properties:
+      GroupDescription: Remote Desktop Secuirty group
+      SecurityGroupIngress:
+        - CidrIp: !Ref 'AccessCidr'
+          FromPort: '8443'
+          IpProtocol: tcp
+          ToPort: '8443'
+      VpcId: !Ref 'VPCId'
+    Type: AWS::EC2::SecurityGroup
+

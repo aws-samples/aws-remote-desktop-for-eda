@@ -1,0 +1,246 @@
+= AWS Remote Desktop For EDA
+:toc:
+:icons:
+:linkattrs:
+
+Launch Xilinx Vivado Design Suite using a DCV Remote Desktop on AWS
+
+## License
+
+This library is licensed under the MIT-0 License.
+
+== Summary
+
+This workshop will launch an instance using the AWS FPGA Developer AMI and configure the instance as a remote desktop using NICE DCV. The AWS FPGA Developer AMI includes the Xilinx Vivado Design Suite. After launch, you will connect using a web browser (or the DCV client) and launch the Vivado GUI and run a workflow with an example design. Here is an animated gif showing a quick overview of the workshop steps:
+
+.Example launch, see the full resolution video here: https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_demo_video.mov[Vivado DCV Demo]
+[#img-vivado]
+[caption=""]
+image::/images/vivado_dcv_demo_video.gif[align="center", width=800]
+
+== References
+
+- https://docs.aws.amazon.com/dcv/latest/adminguide/what-is-dcv.html[NICE DCV]
+- https://www.xilinx.com/products/design-tools/vivado.html[Xilinx Vivado Design Suite]
+
+== Duration
+
+It will take approximately 40 minutes for CloudFormation to automatically create your DCV desktop environment, and launch Vivado. If you run through the example workflow, the time for the entire flow (simulation, synthesis, etc.) will vary depending on the instance type you choose.
+
+== Requirements
+- You will need to scubscribe to the AWS FPGA Developers AMI on the AWS Markeplace (instructions are below).
+- You will need a VPC that has access to the internet, either using a public VPC or NAT gateway. This is required to download all of the packages.
+
+== Architecture
+
+image::/images/vivado_dcv_diagram.png[align="center", width=600]
+
+
+== Step-by-step Guide
+
+=== Subscribe to AWS FPGA Developer AMI
+
+Before you can launch the CloudFormation stack, you will need to subscribe to the AWS FPGA Developer AMI. There is no charge to subscribe to the AWS FPGA Developer AMI, you will only be charged for the underlying resources.
+
+. Sign into your AWS account
+. Go to the AWS FPGA Developer AMI on the AWS Marketplace:  https://aws.amazon.com/marketplace/pp/B06VVYBLZZ
+. Click on **Continue to Subscribe** button on upper right
++
+image::/images/Continue_to_Subscribe.png[align="left", width=600]
+
+=== Launch with CloudFormation
+
+The resources used in this workshop will be launched with AWS CloudFormation. For additional information about CloudFormation please visit https://aws.amazon.com/cloudformation/[AWS CloudFormation].
+
+IMPORTANT: Read through all steps below and watch the quick video before *_clicking_* the *Launch on AWS* button.
+
+. Click on the *Launch on AWS* button and follow the CloudFormation prompts to begin.
++
+Currently available in N regions.
++
+TIP: *_Context-click (right-click)_* the *Launch on AWS* button and open the link in a new tab or window to make it easy to navigate between this github workshop and AWS Console.
++
+
+.Launch ClouldFormation Template
+[cols="3,>1", width=90%]
+|===
+|*Region* | *Launch template*
+
+| *N. Virginia* (us-east-1)
+a|
+
+| *Ohio* (us-east-2)
+a|
+
+| *N. California* (us-west-1)
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
+
+| *Oregon* (us-west-2)
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
+
+| *Ireland* (eu-west-1)
+a|
+
+| *Sydney* (ap-southeast-2)
+a|
+
+| *Hong Kong* (ap-east-1)
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
+
+|===
+
+
++
+. Accept the defaults on the *Prerequisite - Prepare template* page and *_click_* *Next*.
++
+. You should see the *Stack Details* page:
++
+image::/images/stack_details.png[width=600]
++
+. *_Enter_* values for all parameters.
++
+|===
+| *Parameter* | *Variable Name* | *Description*
+
+| *VPC ID*
+| VPCId
+| VPC ID for where the remote desktop instance should be launched
+
+| *Subnet ID*
+| Subnet
+| For the Subnet ID, you should choose one in the Availability Zone where you want the instance launched
+
+| _OPTIONAL_: *Existing Security Group (e.g. sg-abcd1234efgh)*
+| ExistingSecurityGroup
+| *OPTIONAL:* Needs to be a SG ID, for example sg-abcd1234efgh. This is an already existing Security Group ID that is in the same VPC, this is an addition to the security groups that are automatically created to enable access to the remote desktop, leave as NO_VALUE if you choose not use this. Use this link to see you existing secuirity groups: https://us-west-1.console.aws.amazon.com/vpc/home?#SecurityGroups[Security Groups]
+
+| *Remote Desktop Instance Type*
+| remoteDesktopInstanceType
+| This is the instance type that will be used. As this is a 2D workstation, we are not supporting GPU instance types.
+
+| *EC2 Key Name*
+| EC2KeyName
+| Name of an existing EC2 KeyPair to enable SSH access to the instance. More info: https://docs.aws.amazon.com/AWSEC2/latest/UserGuide/ec2-key-pairs.html
+
+| *Operating System of AMI*
+| OperatingSystem
+| Operating System of the AMI. Currently only supporting CentOS 7
+
+| _OPTIONAL_: *Static Private IP Address*
+| StaticPrivateIpAddress
+| *OPTIONAL:* If you already have a private VPC address range, you can specify the private IP address to use, leave as *NO_VALUE* if you choose not use this
+
+| *Assign a public IP address*
+| UsePublicIp
+| Should a public IP address be given to the instance, this is overridden by `*CreateElasticIP = True*`
+
+| *Create an Elastic IP address*
+| CreateElasticIP
+| Should an Elastic IP address be created and assigned, this allows for persistent IP address assignment
+
+| _OPTIONAL_: *S3 bucket for read access*
+| S3BucketName
+| *OPTIONAL:* S3 bucket to allow this instance read access (List and Get), leave as *NO_VALUE* if you choose not use this
+
+| *CIDR block for remote access (ports 22 and 8443)*
+| AccessCidr
+| This is the CIDR block for allowing remote access, for ports 22 and 8443
+
+| *User name for DCV login*
+| UserName
+| User name for DCV remote desktop login, default is *_simuser_*
+
+| *Password for DCV login*
+| UserPass
+| Password for DCV remote desktop login. The default password is `Ch4ng3M3!`
+
+|===
+
++
+. After you have entered values for all parameters, *_click_* *Next*.
+. *_Accept_* the default values of the *Configure stack options* and *Advanced options* sections and *_click_* *Next*.
+. *_Review_* the CloudFormation stack settings.
+. *_Click_* all checkboxes in the blue *Capabilities* box at the bottom of the page.
++
+image::/images/capabilities_checkbox.png[width=600]
++
+. *_Click_* *Create stack*.
++
+. Verify stack was created successfully
++
+In the *Events* tab, you should see `*CREATE_COMPLETE*` for the `AWS::CloudFormation::Stack` event Type.
++
+It will take about 40 minutes for the stack creation to complete. This is due to the large number of packages that need to be installed. Upon completion you should see the connection information (IP address) in the *Outputs* section of the stack.
+
+
+=== Connect to the DCV Remote Desktop session
+
+You can either use your web browser to connect to the DCV Remote Desktop session, or you can optionally download the DCV Client.
+
+
+. *Using a web browser*
++
+.. Make sure that you are using a supported web browser, check her for more info: https://docs.aws.amazon.com/dcv/latest/adminguide/what-is-dcv.html#what-is-dcv-requirements[NICE DCV Requirements]
+.. Use the secure URL, IP address, and correct port (8443) to connect
++
+When you connect make sure you use the https protocol, to ensure you are using a connecting connection.
++
+For example: `https://111.222.333.444:8443`
+
+. *Use the NICE DCV Client*:
++
+.. Here are the https://www.nice-software.com/download/nice-dcv-2017[DCV client downloads]
+.. Use the  IP address, and correct port (8443) to connect
++
+For example: `111.222.333.444:8443`
+
+Here is an example login screen (for the DCV Client you will need to connect first using the IP:Port, for example  111.222.333.444:8443):
+
+image::/images/dcv_login.png[width=300]
+{nbsp}
+
+After you login with the credentials you specified when creating the stack, you see the Desktop.  It should look something like this:
+
+image::/images/dcv_desktop.png[width=600]
+{nbsp}
+
+Run the DCV GL Test. Go to *_Applications -> Other -> DCV GL Test Application_*.
+
+image::/images/dcv_gl_test_menu.png[width=500]
+{nbsp}
+
+You should see this:
+
+image::/images/dcv_gl_test.png[width=600]
+{nbsp}
+
+
+=== Launch Vivado and run sample workflow
+
+Now that your remote desktop is setup, you can launch the Vivado Design Suite (included in the AWS FPGA Developer AMI). To launch Vivado, start a terminal session, go to *_Applications -> Favorites -> Terminal_*.
+
+Now type `vivado` at the command prompt and hit enter:
+
+image::/images/vivado_launch.png[width=450]
+{nbsp}
+
+Vivado will launch in a GUI session, and you should see this:
+
+image::/images/vivado_startup.png[width=600]
+{nbsp}
+
+Now lets run a sample workflow using one of the included example projects. Go to the *Quick Start* section and select *_Open Example Project_*. The wizard will guide you through the process of opening the project, select *Configurable MicorBlaze Design* for your example project. Use the default values for all configuration settings, and click *_Finish_*.
+
+After the project launch you should see this:
+
+image::/images/vivado_example_project_1.png[width=600]
+{nbsp}
+
+Now that the sample project is launched, you can now run through the entire workflow. Here is an example, showing the *Device* view and the *Synthesized Schematic*.
+
+image::/images/vivado_example_design.png[align="center", width=800]
+{nbsp}
+
+
+
+
