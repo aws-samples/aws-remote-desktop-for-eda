@@ -67,7 +67,7 @@ TIP: *_Context-click (right-click)_* the *Launch on AWS* button and open the lin
 |*Region* | *Launch template*
 
 | *N. Virginia* (us-east-1)
-a|
+a| coming soon
 
 | *Ohio* (us-east-2)
 a|
