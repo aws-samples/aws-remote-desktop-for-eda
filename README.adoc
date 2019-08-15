@@ -68,7 +68,7 @@ Currently available in these regions.
 TIP: *_Context-click (right-click)_* the *Launch on AWS* button and open the link in a new tab or window to make it easy to navigate between this github workshop and AWS Console.
 +
 
-.Launch ClouldFormation Template
+.Launch CloudFormation Template
 [cols="3,>1", width=90%]
 |===
 |*Region* | *Launch template*
