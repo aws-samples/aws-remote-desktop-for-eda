@@ -4,4 +4,4 @@ Launch Xilinx Vivado Design Suite using a DCV Remote Desktop on AWS
 
 ## License
 
-This library is licensed under the Apache 2.0 License. 
+This library is licensed under the MIT-0 License. 
