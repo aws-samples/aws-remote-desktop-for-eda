@@ -28,7 +28,7 @@ image::/images/vivado_dcv_demo_video.gif[align="center", width=800]
 It will take approximately 40 minutes for CloudFormation to automatically create your DCV desktop environment, and launch Vivado. If you run through the example workflow, the time for the entire flow (simulation, synthesis, etc.) will vary depending on the instance type you choose.
 
 == Requirements
-- You will need to scubscribe to the AWS FPGA Developers AMI on the AWS Markeplace (instructions are below).
+- You will need to subscribe to the AWS FPGA Developers AMI on the AWS Markeplace (instructions are below).
 - You will need a VPC that has access to the internet, either using a public VPC or NAT gateway. This is required to download all of the packages.
 
 == Architecture
