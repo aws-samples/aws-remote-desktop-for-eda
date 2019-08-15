@@ -56,7 +56,7 @@ IMPORTANT: Read through all steps below and watch the quick video before *_click
 
 . Click on the *Launch on AWS* button and follow the CloudFormation prompts to begin.
 +
-Currently available in N regions.
+Currently available in these regions.
 +
 TIP: *_Context-click (right-click)_* the *Launch on AWS* button and open the link in a new tab or window to make it easy to navigate between this github workshop and AWS Console.
 +
@@ -98,7 +98,7 @@ a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.c
 +
 image::/images/stack_details.png[width=600]
 +
-. *_Enter_* values for all parameters.
+. *_Enter_* values for parameters.
 +
 |===
 | *Parameter* | *Variable Name* | *Description*
@@ -158,7 +158,7 @@ image::/images/stack_details.png[width=600]
 |===
 
 +
-. After you have entered values for all parameters, *_click_* *Next*.
+. After you have entered values for the parameters, *_click_* *Next*.
 . *_Accept_* the default values of the *Configure stack options* and *Advanced options* sections and *_click_* *Next*.
 . *_Review_* the CloudFormation stack settings.
 . *_Click_* all checkboxes in the blue *Capabilities* box at the bottom of the page.
