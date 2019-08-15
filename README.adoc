@@ -67,10 +67,10 @@ TIP: *_Context-click (right-click)_* the *Launch on AWS* button and open the lin
 |*Region* | *Launch template*
 
 | *N. Virginia* (us-east-1)
-a| coming soon
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=us-east-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
 | *Ohio* (us-east-2)
-a|
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=us-east-2#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
 | *N. California* (us-west-1)
 a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=us-west-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
@@ -79,10 +79,10 @@ a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.c
 a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=us-west-2#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
 | *Ireland* (eu-west-1)
-a|
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=eu-west-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
 | *Sydney* (ap-southeast-2)
-a|
+a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=ap-southeast-2#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
 
 | *Hong Kong* (ap-east-1)
 a| image::/images/Launch_on_AWS.png[width=140, link=https://console.aws.amazon.com/cloudformation/home?region=ap-east-1#/stacks/new?stackName=vivado-dcv-wkst&templateURL=https://s3.amazonaws.com/www.edaworkshop.com/vivado_dcv_wkst.yaml]
