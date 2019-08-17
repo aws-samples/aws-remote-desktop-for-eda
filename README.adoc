@@ -33,7 +33,7 @@ It will take approximately 40 minutes for CloudFormation to automatically create
 
 == Requirements
 - You will need to subscribe to the AWS FPGA Developers AMI on the AWS Marketplace (instructions are below).
-- You will need a VPC that has access to the internet, either using a public VPC or NAT gateway. This is required to download all of the packages.
+- You will need a VPC that has access to the internet, either using a public VPC or NAT gateway. This is required to download all of the packages (for both DCV and OS packages).
 
 == Architecture
 
