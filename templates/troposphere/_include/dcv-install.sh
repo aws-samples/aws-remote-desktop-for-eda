@@ -19,7 +19,13 @@
 echo hello
 
 function install_prereqs {
+  sudo yum -y upgrade
+  sudo yum -y install xhost wget
   sudo yum -y groupinstall "GNOME Desktop"
+  gui_inst_rc=$?
+  if [[ "$gui_inst_rc" = "1" ]]; then
+    sudo yum -y groupinstall "Server with GUI"
+  fi
   sudo yum -y upgrade
 }
 
@@ -49,7 +55,7 @@ function add_user {
 function cr_post_reboot {
 
 if [[ ! -d /opt/dcv-install ]]; then
-  mkdir /opt/dcv-install
+  mkdir -p /opt/dcv-install
 fi
 
 cat << EOF > /opt/dcv-install/post_reboot.sh
@@ -60,13 +66,21 @@ function stop_disable_svc() {
   systemctl disable \$1
 }
 
+function cr_dcv_session(){
+  dcv create-session --type=virtual --owner ${user_name} --user ${user_name} virt
+}
+
 stop_disable_svc firewalld
 stop_disable_svc libvirtd
-systemctl isolate multi-user.target
-systemctl isolate graphical.target
+systemctl set-default graphical.target
 DISPLAY=:0 XAUTHORITY=\$(ps aux | grep "X.*\\-auth" | grep -v grep | awk -F"-auth " '{print \$2}' | awk '{print \$1}') xhost | grep "SI:localuser:dcv$"
-dcv create-session --type=virtual --owner ${user_name} --user ${user_name} virt
-dcv list-sessions
+ls_dcv_sessions=\$(dcv list-sessions 2>&1)
+while [[ "\$ls_dcv_sessions" = "There are no sessions available" ]]; do
+  echo "No DCV session available, creating a session..."
+  cr_dcv_session
+  ls_dcv_sessions=\$(dcv list-sessions 2>&1)
+  sleep 5
+done
 
 my_wait_handle="${my_wait_handle}"
 
@@ -123,6 +137,7 @@ add_user
 cr_post_reboot
 cr_service
 
+systemctl set-default graphical.target
 systemctl enable dcvserver
 echo "false" > /tmp/wait-handle-sent
 stop_disable_svc firewalld
@@ -132,5 +147,3 @@ reboot
 }
 
 main
-
-
