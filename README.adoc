@@ -39,7 +39,7 @@ It will take approximately 40 minutes for CloudFormation to automatically create
 
 The Official AWS Reference Architecture can be found here: https://d1.awsstatic.com/architecture-diagrams/ArchitectureDiagrams/eda_remote_desktop_ra.pdf?did=wp_card&trk=wp_card[Remote Desktop for EDA]
 
-image::/images/ref_arch_ vivado_dcv_diagram.png[align="center", width=800]
+image::/images/ref_arch_ vivado_dcv_diagram.png[align="center", width=1000]
 
 == Price
 
