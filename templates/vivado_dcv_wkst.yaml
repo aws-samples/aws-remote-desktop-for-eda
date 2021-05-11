@@ -351,10 +351,10 @@ Resources:
             mkdir /tmp/dcv-inst.d
             pushd /tmp/dcv-inst.d
             rpm --import https://s3-eu-west-1.amazonaws.com/nice-dcv-publish/NICE-GPG-KEY
-            wget https://d1uj6qtbmh3dt5.cloudfront.net/server/nice-dcv-2017.4-6898-el7.tgz
-            tar xvf nice-dcv-2017.4-6898-el7.tgz
-            cd nice-dcv-2017.4-6898-el7/
-            yum -y install nice-dcv-server-2017.4.6898-1.el7.x86_64.rpm nice-xdcv-2017.4.210-1.el7.x86_64.rpm nice-dcv-gltest-2017.4.216-1.el7.x86_64.rpm
+            wget https://d1uj6qtbmh3dt5.cloudfront.net/2021.0/Servers/nice-dcv-2021.0-10242-el7-x86_64.tgz
+            tar xvf nice-dcv-2021.0-10242-el7-x86_64.tgz
+            cd nice-dcv-2021.0-10242-el7-x86_64/
+            yum -y install nice-dcv-server-2021.0.10242-1.el7.x86_64.rpm nice-xdcv-2021.0.380-1.el7.x86_64.rpm nice-dcv-gltest-2021.0.266-1.el7.x86_64.rpm
             popd
           }
 
